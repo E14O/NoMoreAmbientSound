@@ -1,7 +1,7 @@
 ﻿using System;
 using BepInEx;
 using UnityEngine;
-using Utilla;
+using UnityEngine.SceneManagement;
 
 namespace NoMoreAmbientSound
 {
@@ -9,9 +9,6 @@ namespace NoMoreAmbientSound
     /// This is your mod's main class.
     /// </summary>
 
-    /* This attribute tells Utilla to look for [ModdedGameJoin] and [ModdedGameLeave] */
-    [ModdedGamemode]
-    [BepInDependency("org.legoandmars.gorillatag.utilla", "1.5.0")]
     [BepInPlugin(PluginInfo.GUID, PluginInfo.Name, PluginInfo.Version)]
     public class Plugin : BaseUnityPlugin
     {
@@ -19,44 +16,54 @@ namespace NoMoreAmbientSound
 
         void Start()
         {
-            /* A lot of Gorilla Tag systems will not be set up when start is called /*
-			/* Put code in OnGameInitialized to avoid null references */
-
-            Utilla.Events.GameInitialized += OnGameInitialized;
+            GorillaTagger.OnPlayerSpawned(OnGameInitialized);
         }
-        void OnGameInitialized(object sender, EventArgs e)
+
+        void OnGameInitialized()
         {
+            // since we are in stump when we load and forest is loaded in, we should just destroy it when we spawn
+            var Forest = GameObject.Find("Environment Objects/LocalObjects_Prefab/Forest/Environment/WeatherDayNight");
+            if (Forest)
+                Destroy(Forest);
+
+            SceneManager.sceneLoaded += SceneManager_sceneLoaded;
         }
 
-        void Update()
+        private void SceneManager_sceneLoaded(Scene scene, LoadSceneMode sceneMode)
         {
             var Forest = GameObject.Find("Environment Objects/LocalObjects_Prefab/Forest/Environment/WeatherDayNight");
-            Destroy(Forest);
+            if (Forest)
+                Destroy(Forest);
 
             var Metropilis = GameObject.Find("MetroMain/Metro_SoundObjects");
-            Destroy(Metropilis);
+            if (Metropilis)
+                Destroy(Metropilis);
 
             var Mountains = GameObject.Find("Mountain/MountainsAmbience");
-            Destroy(Mountains);
+            if (Mountains)
+                Destroy(Mountains);
 
             var Basement = GameObject.Find("Basement/DungeonRoomAnchor/DungeonBasement/");
-            Destroy(Basement);
+            if (Basement)
+                Destroy(Basement);
 
             var Arcade = GameObject.Find("Environment Objects/LocalObjects_Prefab/City_WorkingPrefab/Arcade_prefab/ArcadeAudio");
-            Destroy(Arcade);
+            if (Arcade)
+                Destroy(Arcade);
 
             var Beach = GameObject.Find("Beach/Beach_SoundObjects");
-            Destroy(Beach);
+            if (Beach)
+                Destroy(Beach);
 
             var Clouds = GameObject.Find("skyjungle/Ambience");
-            Destroy(Clouds);
+            if (Clouds)
+                Destroy(Clouds);
 
             var Caves = GameObject.Find("Cave_Main_Prefab/NewCave/Cave_Audio_Prefab");
-            Destroy(Caves);
-
-            // ik i could have just disabled the actual sound hearning thing in he rig but now i can easily choice which sound i want to remove (to hear again)
+            if (Caves)
+                Destroy(Caves);
         }
 
-        // Code Is All Written By E14O, Its Not To Be Skidded From Nor Sold Without His Permmision.
+        // Code Is All Written By E14O, Its Not To Be Skidded From Nor Sold Without His Permission.
     }
 }
